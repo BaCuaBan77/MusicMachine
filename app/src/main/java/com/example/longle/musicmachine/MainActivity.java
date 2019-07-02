@@ -1,6 +1,7 @@
 package com.example.longle.musicmachine;
 
 import android.os.Bundle;
+import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -15,6 +16,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        final DownloadThread thread = new DownloadThread();
+        thread.setName("Download Thread");
+        thread.start();
 
         mDownloadButton = findViewById(R.id.downloadButton);
 
@@ -22,9 +26,15 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Toast.makeText(MainActivity.this, "Downloading", Toast.LENGTH_SHORT).show();
-                DownloadThread thread = new DownloadThread();
-                thread.setName("Download Thread");
-                thread.start();
+
+                //Send messages or runnable to Handler for processing
+                for (String song : Playlist.songs) {
+                    Message message = Message.obtain();
+                    message.obj = song;
+                    thread.mHandler.handleMessage(message);
+                }
+
+
             }
         });
     }
